@@ -16,6 +16,7 @@ import {getOrganizations, getRepositories, getFiles, getUserRepositories} from '
 import {RectangularButton} from '../Components/Buttons'
 import OpenIcon from '../assets/icons/Open.svg'
 import UploadIcon from '../assets/icons/Upload.svg'
+import {syncContent} from '../../public/static/js/superviz/supervizInitialize'
 
 
 /**
@@ -217,6 +218,7 @@ function SampleModelFileSelector({setIsDialogDisplayed}) {
       6: '/share/v/gh/OlegMoshkovich/Logo/main/IFC_STUDY.ifc',
     }
     window.removeEventListener('beforeunload', handleBeforeUnload)
+    syncContent(modelPath[e.target.value])
     navigate({pathname: modelPath[e.target.value]})
     closeDialog()
   }

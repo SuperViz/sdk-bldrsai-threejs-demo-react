@@ -9,6 +9,7 @@ export const SDK_SYNC_PLANE_SELECTED = 'sdkSyncPlaneSelected'
 export const SDK_SYNC_CUT_PLANES = 'sdkSyncCutPlanes'
 export const SDK_SYNC_DESELECT_ITEMS = 'sdkSyncDeselectItems'
 export let superviz = null
+export const CONTENT_SYNC_CHANGE_MODEL = 'changeModel'
 
 const totalAvatars = 9
 
@@ -53,13 +54,13 @@ export async function initializeSupervizSDK() {
 /**
  *  load Plugin Superviz SDK
  */
-export async function loadPluginSupervizSDK(viewer) {
+export async function loadPluginSupervizSDK(viewer, load = null) {
   const scene = viewer.context.scene.scene
   const camera = viewer.context.ifcCamera.perspectiveCamera
   const player = camera
   const plugin = new ThreeJsPlugin(scene, camera, player)
 
-  await superviz.subscribe(window.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_JOINED, () => {
+  const loadPlugin = () => {
     superviz.loadPlugin(plugin, {
       avatarConfig: {
         height: 0,
@@ -72,6 +73,13 @@ export async function loadPluginSupervizSDK(viewer) {
       isNameEnabled: true,
       renderLocalAvatar: true,
     })
+  }
+  if (load) {
+    loadPlugin()
+  }
+
+  await superviz.subscribe(window.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_JOINED, () => {
+    loadPlugin()
   })
 
   await superviz.subscribe(window.SuperVizSdk.MeetingEvent.MEETING_LEAVE, function() {
@@ -102,8 +110,24 @@ export const syncSdkPlane = (content) => {
 }
 
 /**
- *  Sync Delete Planes
+ *  Sync Deselect Planes
  */
 export const syncSdkDeselectItems = () => {
   superviz.setSyncProperty(SDK_SYNC_DESELECT_ITEMS, 'deselectItems')
+}
+
+/**
+ *  Sync on Content Changed
+ */
+export const onContentChanged = (viewer) => {
+  superviz.unloadPlugin()
+  const loadModel = true
+  loadPluginSupervizSDK(viewer, loadModel)
+}
+
+/**
+ *  Sync Content
+ */
+export const syncContent = (newModelSid) => {
+  superviz.setSyncProperty(CONTENT_SYNC_CHANGE_MODEL, newModelSid)
 }

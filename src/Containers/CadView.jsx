@@ -25,25 +25,34 @@ import {handleBeforeUnload} from '../utils/event'
 import {getDownloadURL, parseGitHubRepositoryURL} from '../utils/GitHub'
 import SearchIndex from './SearchIndex'
 import {usePlaceMark} from '../hooks/usePlaceMark'
-import {initializeSupervizSDK, loadPluginSupervizSDK, syncSdkScene, syncSdkPlane, syncSdkDeselectItems, superviz,
-  SDK_SYNC_PLANE_SELECTED, SDK_SYNC_CUT_PLANES, SDK_SYNC_DESELECT_ITEMS, userId} from '../../public/static/js/superviz/supervizInitialize'
+import {initializeSupervizSDK,
+  loadPluginSupervizSDK,
+  syncSdkScene,
+  syncSdkPlane,
+  syncSdkDeselectItems,
+  superviz,
+  SDK_SYNC_PLANE_SELECTED,
+  SDK_SYNC_CUT_PLANES,
+  SDK_SYNC_DESELECT_ITEMS,
+  CONTENT_SYNC_CHANGE_MODEL,
+  onContentChanged,
+  userId} from '../../public/static/js/superviz/supervizInitialize'
 import {getPlaneSceneInfo} from '../../src/Components/CutPlaneMenu'
 import {Vector3} from 'three'
 import {getAllHashParams, addHashParams, removeHashParams} from '../utils/location'
 
 
-const PLANE_PREFIX = 'p'
-
-let viewer = null
 export let isHost = false
 /**
  * Experimenting with a global. Just calling #indexElement and #clear
  * when new models load.
  */
 export const searchIndex = new SearchIndex()
+
+const PLANE_PREFIX = 'p'
 let count = 0
-
-
+let viewer = null
+let modelUuid = null
 /**
  * Only container for the for the app.  Hosts the IfcViewer as well as
  * nav components.
@@ -196,6 +205,13 @@ export default function CadView({
           deselectItems()
         }
       })
+      // change model
+      await superviz.subscribe(CONTENT_SYNC_CHANGE_MODEL, function(newModel) {
+        superviz.unloadPlugin()
+        if (!isHost) {
+          navigate({pathname: newModel})
+        }
+      })
     })()
   }, [])
 
@@ -281,6 +297,11 @@ export default function CadView({
       viewer.isolator.unHideAllElements()
       viewer.isolator.hideElementsById(previouslyHiddenELements)
     }
+    if ((modelUuid !== null) && (modelUuid !== tmpModelRef.uuid)) {
+      onContentChanged(viewer)
+      clipper()
+    }
+    modelUuid = tmpModelRef.uuid
   }
 
 
