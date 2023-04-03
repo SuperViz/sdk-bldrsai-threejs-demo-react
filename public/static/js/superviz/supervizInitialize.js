@@ -12,8 +12,7 @@ export let superviz = null
 export const CONTENT_SYNC_CHANGE_MODEL = 'changeModel'
 
 
-// const DEVELOPER_KEY = process.env.SUPERVIZ_DEVELOPER_TOKEN
-const DEVELOPER_KEY = 'ypxgtea8rr2edxrnr1200ji117oc59'
+const DEVELOPER_KEY = process.env.SUPERVIZ_DEVELOPER_TOKEN
 const nameUser = 'nome'
 const typeUser = 'host'
 
