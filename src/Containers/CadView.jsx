@@ -36,10 +36,11 @@ import {initializeSupervizSDK,
   SDK_SYNC_DESELECT_ITEMS,
   CONTENT_SYNC_CHANGE_MODEL,
   onContentChanged,
+  unsubscribeMeetingEvents,
   userId} from '../../public/static/js/superviz/supervizInitialize'
 import {getPlaneSceneInfo} from '../../src/Components/CutPlaneMenu'
 import {Vector3} from 'three'
-import {getAllHashParams, addHashParams, removeHashParams} from '../utils/location'
+import {addHashParams, removeHashParams} from '../utils/location'
 
 
 export let isHost = false
@@ -179,35 +180,29 @@ export default function CadView({
       const viewerState = useStore.getState().viewer
       await loadPluginSupervizSDK(viewerState)
       await superviz.subscribe(SDK_SYNC_PLANE_SELECTED, function(selectedId) {
-        const pathIds = getPathIdsForElements(selectedId)
-        const repoFilePath = modelPath.gitpath ? modelPath.getRepoPath() : modelPath.filepath
-        const path = pathIds.join('/')
-        navigate(`${pathPrefix}${repoFilePath}/${path}`)
+        navigate(selectedId)
       })
-      await superviz.subscribe(window.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_JOINED, function(payload) {
+      await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_JOINED, function(payload) {
         clipper()
       })
-      await superviz.subscribe(window.SuperVizSdk.MeetingEvent.MEETING_HOST_CHANGE, async function(payload) {
+      await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MEETING_HOST_CHANGE, async function(payload) {
         if (viewer.clipper.context.clippingPlanes.length > 0) {
           await deselectItems()
         }
-        if (payload.id === userId) {
-          isHost = true
-          return
-        }
-        isHost = false
+        isHost = payload.id === userId
       })
-      await superviz.subscribe(window.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_UPDATED, function(payload) {
+      await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_UPDATED, function(payload) {
         isHost = payload.isHost
       })
       await superviz.subscribe(SDK_SYNC_DESELECT_ITEMS, function() {
-        if (!isHost) {
+        if (!isHost && viewer.clipper.context.clippingPlanes.length > 0) {
           deselectItems()
         }
       })
       // change model
       await superviz.subscribe(CONTENT_SYNC_CHANGE_MODEL, function(newModel) {
         superviz.unloadPlugin()
+        unsubscribeMeetingEvents()
         if (!isHost) {
           navigate({pathname: newModel})
         }
@@ -230,7 +225,6 @@ export default function CadView({
   }, [location, model])
   /* eslint-enable */
 
-
   /**
    * Begin setup for new model. Turn off nav, search and item and init
    * new viewer.
@@ -250,7 +244,6 @@ export default function CadView({
     initViewerCb(undefined, theme)
     theme.addThemeChangeListener(initViewerCb)
   }
-
 
   /** When viewer is ready, load IFC model. */
   async function onViewer() {
@@ -278,7 +271,6 @@ export default function CadView({
       viewer.IFC.selector.preselection.material = preselectMat
       viewer.IFC.selector.selection.material = selectMat
     }
-
     const pathToLoad = modelPath.gitpath || (installPrefix + modelPath.filepath)
     const tmpModelRef = await loadIfc(pathToLoad)
     debug().log('CadView#onViewer: tmpModelRef: ', tmpModelRef)
@@ -297,11 +289,12 @@ export default function CadView({
       viewer.isolator.unHideAllElements()
       viewer.isolator.hideElementsById(previouslyHiddenELements)
     }
-    if ((modelUuid !== null) && (modelUuid !== tmpModelRef.uuid)) {
+
+    if (modelUuid !== null) {
       onContentChanged(viewer)
       clipper()
     }
-    modelUuid = tmpModelRef.uuid
+    modelUuid = tmpModelRef
   }
 
 
@@ -559,10 +552,9 @@ export default function CadView({
         const pathIds = getPathIdsForElements(lastId)
         const repoFilePath = modelPath.gitpath ? modelPath.getRepoPath() : modelPath.filepath
         const path = pathIds.join('/')
-        const curHashParams = getAllHashParams()
-        debug().log('CadView#selectItemsInScene: curHashParams: ', curHashParams)
-        navigate(`${pathPrefix}${repoFilePath}/${path}#${curHashParams}`)
-        syncSdkScene(lastId)
+        navigate(`${pathPrefix}${repoFilePath}/${path}`)
+        const contentPath = `${pathPrefix}${repoFilePath}/${path}`
+        syncSdkScene(contentPath)
       }
     } catch (e) {
       // IFCjs will throw a big stack trace if there is not a visual

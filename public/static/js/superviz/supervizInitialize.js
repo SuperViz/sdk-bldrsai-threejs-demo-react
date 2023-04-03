@@ -1,4 +1,4 @@
-import SuperVizSdk from '@superviz/sdk'
+import SuperVizSdk, {MeetingEvent} from '@superviz/sdk'
 import {ThreeJsPlugin} from '@superviz/threejs-plugin'
 
 // import * as process from 'node:process'
@@ -11,20 +11,11 @@ export const SDK_SYNC_DESELECT_ITEMS = 'sdkSyncDeselectItems'
 export let superviz = null
 export const CONTENT_SYNC_CHANGE_MODEL = 'changeModel'
 
-const totalAvatars = 9
 
 // const DEVELOPER_KEY = process.env.SUPERVIZ_DEVELOPER_TOKEN
 const DEVELOPER_KEY = 'ypxgtea8rr2edxrnr1200ji117oc59'
 const nameUser = 'nome'
 const typeUser = 'host'
-const customAvatars = []
-
-for (let i = 1; i <= totalAvatars; i++) {
-  customAvatars.push({
-    model: `https://production.storage.superviz.com/readyplayerme/${i}.glb`,
-    thumbnail: `https://production.cdn.superviz.com/static/default-avatars/${i}.png`,
-  })
-}
 
 /**
  * initialize superviz SDK
@@ -42,11 +33,9 @@ export async function initializeSupervizSDK() {
     },
     roomId: 'vinicius',
     defaultAvatars: true,
-    avatars: customAvatars,
     enableFollow: true,
     enableGoTo: true,
     enableGather: true,
-    debug: false,
     environment: 'dev',
   })
 }
@@ -78,19 +67,19 @@ export async function loadPluginSupervizSDK(viewer, load = null) {
     loadPlugin()
   }
 
-  await superviz.subscribe(window.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_JOINED, () => {
+  await superviz.subscribe(MeetingEvent.MY_PARTICIPANT_JOINED, () => {
     loadPlugin()
   })
 
-  await superviz.subscribe(window.SuperVizSdk.MeetingEvent.MEETING_LEAVE, function() {
-    superviz.unloadPlugin()
-    superviz.destroy()
-  })
-  await superviz.subscribe(window.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_LEFT, function() {
+  await superviz.subscribe(MeetingEvent.MEETING_LEAVE, function() {
     superviz.unloadPlugin()
   })
-  await superviz.subscribe(window.SuperVizSdk.MeetingEvent.DESTROY, function() {
+  await superviz.subscribe(MeetingEvent.MY_PARTICIPANT_LEFT, function() {
     superviz.unloadPlugin()
+  })
+  await superviz.subscribe(MeetingEvent.DESTROY, function() {
+    superviz.unloadPlugin()
+    unsubscribeAllEvents()
     superviz = null
   })
 }
@@ -130,4 +119,30 @@ export const onContentChanged = (viewer) => {
  */
 export const syncContent = (newModelSid) => {
   superviz.setSyncProperty(CONTENT_SYNC_CHANGE_MODEL, newModelSid)
+}
+
+/**
+ * unsubiscribe only MeetingEvent
+ */
+export function unsubscribeMeetingEvents() {
+  superviz.unsubscribe(MeetingEvent.MY_PARTICIPANT_JOINED)
+  superviz.unsubscribe(MeetingEvent.MEETING_LEAVE)
+  superviz.unsubscribe(MeetingEvent.MY_PARTICIPANT_LEFT)
+  superviz.unsubscribe(MeetingEvent.MY_PARTICIPANT_UPDATED)
+  superviz.unsubscribe(MeetingEvent.MEETING_HOST_CHANGE)
+}
+/**
+ * unsubiscribe all when destroyed
+ */
+function unsubscribeAllEvents() {
+  superviz.unsubscribe(SDK_SYNC_CUT_PLANES)
+  superviz.unsubscribe(SDK_SYNC_PLANE_SELECTED)
+  superviz.unsubscribe(SDK_SYNC_DESELECT_ITEMS)
+  superviz.unsubscribe(CONTENT_SYNC_CHANGE_MODEL)
+  superviz.unsubscribe(MeetingEvent.MY_PARTICIPANT_JOINED)
+  superviz.unsubscribe(MeetingEvent.MEETING_LEAVE)
+  superviz.unsubscribe(MeetingEvent.MY_PARTICIPANT_LEFT)
+  superviz.unsubscribe(MeetingEvent.MY_PARTICIPANT_UPDATED)
+  superviz.unsubscribe(MeetingEvent.MEETING_HOST_CHANGE)
+  superviz.unsubscribe(MeetingEvent.DESTROY)
 }
