@@ -1,41 +1,50 @@
-# This is a basic workflow to help you get started with Actions
-
-name: yarn test
-
-# Controls when the workflow will run
+name: Deploy demo
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+    branches:
+      - main
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    env:
-      NODE_ENV: test
-
-    # The type of runner that the job will run on
+  main:
+    if: "github.ref == 'refs/heads/main'"
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
-          node-version: 16
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+          node-version: '16.x'
+      - name: create environment files
+        env:
+          DEPLOY_ENV_FILE: ${{ secrets.DEPLOY_ENV }}
         run: |
-          echo Running tests
-          yarn install
-          yarn lint
-          yarn test
+          echo $DEPLOY_ENV_FILE | base64 --decode > .env
+      - run: git config --global user.name SuperViz
+      - run: git config --global user.email ci@superviz.com
+      - name: Install dependencies
+        run: yarn
+      - name: Build package
+        run: yarn build
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Deploy static site to S3 bucket
+        run: aws s3 sync ./dist/ s3://sdk-bldrsai-threejs-demo-react.superviz.com --delete
+      - name: Create Cloudfront invalidation
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.DISTRIBUTION_ID }} --paths "/*"
+  slackNotificationProduction:
+    needs: main
+    name: Slack Notification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_ICON: https://avatars.slack-edge.com/2020-11-18/1496892993975_af721d1c045bea2d5a46_48.png
+          MSG_MINIMAL: true
+          SLACK_USERNAME: Deploy BLDRSAI DEMO
