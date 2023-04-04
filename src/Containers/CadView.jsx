@@ -36,7 +36,6 @@ import {initializeSupervizSDK,
   SDK_SYNC_DESELECT_ITEMS,
   CONTENT_SYNC_CHANGE_MODEL,
   onContentChanged,
-  unsubscribeMeetingEvents,
   userId} from '../../public/static/js/superviz/supervizInitialize'
 import {getPlaneSceneInfo} from '../../src/Components/CutPlaneMenu'
 import {Vector3} from 'three'
@@ -88,9 +87,8 @@ export default function CadView({
   const [loadingMessage, setLoadingMessage] = useState()
   const [model, setModel] = useState(null)
   viewer = useStore((state) => state.viewer)
-  // const getNavigate = useStore((state) => state.navigate)
   const setViewer = useStore((state) => state.setViewer)
-  // const setNavigate = useStore((state) => state.setNavigate)
+  const setViewerStore = useStore((state) => state.setViewerStore)
   const isNavPanelOpen = useStore((state) => state.isNavPanelOpen)
   const isDrawerOpen = useStore((state) => state.isDrawerOpen)
   const setCutPlaneDirections = useStore((state) => state.setCutPlaneDirections)
@@ -100,7 +98,6 @@ export default function CadView({
   const setSelectedElement = useStore((state) => state.setSelectedElement)
   const setSelectedElements = useStore((state) => state.setSelectedElements)
   const selectedElements = useStore((state) => state.selectedElements)
-  const setViewerStore = useStore((state) => state.setViewerStore)
   // const setNavigationStore = useStore((state) => state.setNavigationStore)
   const snackMessage = useStore((state) => state.snackMessage)
   // const repository = useStore((state) => state.repository)
@@ -185,27 +182,24 @@ export default function CadView({
       await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_JOINED, function(payload) {
         clipper()
       })
-      await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MEETING_HOST_CHANGE, async function(payload) {
-        if (viewer.clipper.context.clippingPlanes.length > 0) {
-          await deselectItems()
-        }
+      await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MEETING_HOST_CHANGE, function(payload) {
+        deselectItems()
         isHost = payload.id === userId
       })
       await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_UPDATED, function(payload) {
         isHost = payload.isHost
       })
       await superviz.subscribe(SDK_SYNC_DESELECT_ITEMS, function() {
-        if (!isHost && viewer.clipper.context.clippingPlanes.length > 0) {
+        if (!isHost) {
           deselectItems()
         }
       })
       // change model
       await superviz.subscribe(CONTENT_SYNC_CHANGE_MODEL, function(newModel) {
-        superviz.unloadPlugin()
-        unsubscribeMeetingEvents()
         if (!isHost) {
           navigate({pathname: newModel})
         }
+        superviz.unloadPlugin()
       })
     })()
   }, [])
@@ -528,9 +522,7 @@ export default function CadView({
       viewer.clipper.deleteAllPlanes()
     }
     resetState()
-    const repoFilePath = modelPath.gitpath ? modelPath.getRepoPath() : modelPath.filepath
     window.removeEventListener('beforeunload', handleBeforeUnload)
-    navigate(`${pathPrefix}${repoFilePath}`)
   }
 
   /**

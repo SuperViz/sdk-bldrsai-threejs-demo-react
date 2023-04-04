@@ -1,15 +1,11 @@
 import React, {useRef, useEffect, useState} from 'react'
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom'
 import Box from '@mui/material/Box'
-import InputBase from '@mui/material/InputBase'
 import Paper from '@mui/material/Paper'
-import useTheme from '@mui/styles/useTheme'
 import {looksLikeLink, githubUrlOrPathToSharePath} from '../ShareRoutes'
 import debug from '../utils/debug'
 import {handleBeforeUnload} from '../utils/event'
 import OpenModelControl from './OpenModelControl'
-import {TooltipIconButton} from './Buttons'
-import ClearIcon from '../assets/icons/Clear.svg'
 
 
 /**
@@ -24,7 +20,6 @@ export default function SearchBar({fileOpen}) {
   const [searchParams, setSearchParams] = useSearchParams()
   const [inputText, setInputText] = useState('')
   const [error, setError] = useState('')
-  const onInputChange = (event) => setInputText(event.target.value)
   const searchInputRef = useRef(null)
   // input length is dynamically calculated in order to fit the input string into the Text input
   const widthPerChar = 6.5
@@ -32,7 +27,6 @@ export default function SearchBar({fileOpen}) {
   const widthPx = (Number(inputText.length) * widthPerChar) + minWidthPx
   // it is passed into the styles as a property the input width needs to change when the query exceeds the minWidth
   // TODO(oleg): find a cleaner way to achieve this
-  const theme = useTheme()
 
 
   useEffect(() => {
@@ -114,43 +108,7 @@ export default function SearchBar({fileOpen}) {
         }}
       >
         <OpenModelControl fileOpen={fileOpen}/>
-        <InputBase
-          inputRef={searchInputRef}
-          value={inputText}
-          onChange={onInputChange}
-          error={true}
-          placeholder={'Search'}
-          sx={{
-            ...theme.typography.tree,
-            'marginTop': '4px',
-            'marginLeft': '14px',
-            '& input::placeholder': {
-              opacity: .2,
-            },
-          }}
-        />
-        {inputText.length > 0 &&
-          <TooltipIconButton
-            title='clear'
-            onClick={() => {
-              setInputText('')
-              setError('')
-            }}
-            icon={<ClearIcon/>}
-          />
-        }
       </Paper>
-      { inputText.length > 0 &&
-        error.length > 0 &&
-        <Box sx={{
-          marginLeft: '10px',
-          marginTop: '3px',
-          fontSize: '10px',
-          color: 'red',
-        }}
-        >{error}
-        </Box>
-      }
     </Box>
   )
 }

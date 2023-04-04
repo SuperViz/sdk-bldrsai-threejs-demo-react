@@ -121,16 +121,6 @@ export const syncContent = (newModelSid) => {
 }
 
 /**
- * unsubiscribe only MeetingEvent
- */
-export function unsubscribeMeetingEvents() {
-  superviz.unsubscribe(MeetingEvent.MY_PARTICIPANT_JOINED)
-  superviz.unsubscribe(MeetingEvent.MEETING_LEAVE)
-  superviz.unsubscribe(MeetingEvent.MY_PARTICIPANT_LEFT)
-  superviz.unsubscribe(MeetingEvent.MY_PARTICIPANT_UPDATED)
-  superviz.unsubscribe(MeetingEvent.MEETING_HOST_CHANGE)
-}
-/**
  * unsubiscribe all when destroyed
  */
 function unsubscribeAllEvents() {
