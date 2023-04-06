@@ -37,7 +37,7 @@ import {initializeSupervizSDK,
   CONTENT_SYNC_CHANGE_MODEL,
   onContentChanged,
   syncContent,
-  userId} from '../../public/static/js/superviz/supervizInitialize'
+  myParticipantId} from '../../public/static/js/superviz/supervizInitialize'
 import {getPlaneSceneInfo} from '../../src/Components/CutPlaneMenu'
 import {Vector3} from 'three'
 import {addHashParams, removeHashParams} from '../utils/location'
@@ -185,7 +185,7 @@ export default function CadView({
       })
       await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MEETING_HOST_CHANGE, function(payload) {
         deselectItems()
-        isHost = payload.id === userId
+        isHost = payload.id === myParticipantId
       })
       await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_UPDATED, function(payload) {
         isHost = payload.isHost
