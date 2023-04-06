@@ -5,7 +5,7 @@ import useTheme from '@mui/styles/useTheme'
 import useStore from '../store/useStore'
 import {assertDefined} from '../utils/assert'
 import {hexToRgba} from '../utils/color'
-// import {useIsMobile} from './Hooks'
+import {useIsMobile} from './Hooks'
 // import AboutControl from './About/AboutControl'
 import CameraControl from './CameraControl'
 import CutPlaneMenu from './CutPlaneMenu'
@@ -43,7 +43,7 @@ export default function OperationsGroup({deselectItems}) {
   // const toggleIsHelpTooltips = useStore((state) => state.toggleIsHelpTooltips)
   // const isHelpTooltips = useStore((state) => state.isHelpTooltips)
   // const turnOffIsHelpTooltips = useStore((state) => state.turnOffIsHelpTooltips)
-  // const isMobile = useIsMobile()
+  const isMobile = useIsMobile()
   // const turnOffTooltips = () => {
   //   return isMobile ? turnOffIsHelpTooltips() : null
   // }
@@ -74,10 +74,12 @@ export default function OperationsGroup({deselectItems}) {
   // disappear. This keeps them visible.
   const bgOpacity = 0.2
   const bgColor = hexToRgba(assertDefined(theme.palette.scene.background), bgOpacity)
+  const positionOnDevice = isMobile ? '0px' : '200px'
+
   return (
     <Box
       sx={{
-        'right': '200px',
+        'right': `${positionOnDevice}`,
         'position': 'absolute',
         'display': 'flex',
         'flexDirection': 'column',

@@ -17,6 +17,7 @@ import {RectangularButton} from '../Components/Buttons'
 import OpenIcon from '../assets/icons/Open.svg'
 import UploadIcon from '../assets/icons/Upload.svg'
 import {syncContent} from '../../public/static/js/superviz/supervizInitialize'
+import {isHost} from '../Containers/CadView'
 
 
 /**
@@ -61,8 +62,8 @@ export default function OpenModelControl({fileOpen}) {
     >
       <Paper elevation={0} variant='control'>
         <TooltipIconButton
-          title={'Open IFC'}
-          onClick={() => setIsDialogDisplayed(true)}
+          title={'Open IFC - Only in meetings and must be a Host user'}
+          onClick={() => setIsDialogDisplayed(isHost)}
           icon={<OpenIcon/>}
           placement={'right'}
           selected={isDialogDisplayed}
@@ -103,6 +104,9 @@ function OpenModelDialog({isDialogDisplayed, setIsDialogDisplayed, fileOpen, org
   const fileName = filesArr[selectedFileName]
 
   const openFile = () => {
+    if (!isHost) {
+      return
+    }
     fileOpen()
     setIsDialogDisplayed(false)
   }
@@ -150,45 +154,61 @@ function OpenModelDialog({isDialogDisplayed, setIsDialogDisplayed, fileOpen, org
             textAlign: 'left',
           }}
         >
-          <SampleModelFileSelector setIsDialogDisplayed={setIsDialogDisplayed}/>
-          <p>Visit our {' '}
-            <a
-              target="_blank"
-              href='https://github.com/bldrs-ai/Share/wiki/GitHub-model-hosting'
-              rel="noreferrer"
-            >
+          {isHost && (
+            <SampleModelFileSelector setIsDialogDisplayed={setIsDialogDisplayed}/>
+          )}
+          {isAuthenticated && (
+            <p>Visit our {' '}
+              <a
+                target="_blank"
+                href='https://github.com/bldrs-ai/Share/wiki/GitHub-model-hosting'
+                rel="noreferrer"
+              >
               wiki
-            </a> to learn more about GitHub hosting.
-          </p>
-          {isAuthenticated ?
-          <Box>
-            <Selector label={'Organization'} list={orgNamesArrWithAt} selected={selectedOrgName} setSelected={selectOrg}/>
-            <Selector label={'Repository'} list={repoNamesArr} selected={selectedRepoName} setSelected={selectRepo} testId={'Repository'}/>
-            <Selector label={'File'} list={filesArr} selected={selectedFileName} setSelected={setSelectedFileName} testId={'File'}/>
-            {selectedFileName !== '' &&
+              </a> to learn more about GitHub hosting.
+            </p>
+          )}
+          {isAuthenticated && (
+            <Box>
+              <Selector label={'Organization'} list={orgNamesArrWithAt} selected={selectedOrgName} setSelected={selectOrg}/>
+              <Selector label={'Repository'} list={repoNamesArr} selected={selectedRepoName}
+                setSelected={selectRepo} testId={'Repository'}
+              />
+              <Selector label={'File'} list={filesArr} selected={selectedFileName} setSelected={setSelectedFileName} testId={'File'}/>
+              {selectedFileName !== '' &&
               <Box sx={{textAlign: 'center', marginTop: '4px'}}>
                 <RectangularButton title={'Load file'} icon={<UploadIcon/>} onClick={navigateToFile}/>
               </Box>
-            }
-          </Box> :
-          <Typography
-            variant={'h4'}
-            sx={{
-              backgroundColor: theme.palette.scene.background,
-              borderRadius: '5px',
-              padding: '12px',
-            }}
-          >
+              }
+            </Box>
+          )}
+          {isAuthenticated && (
+            <Typography
+              variant={'h4'}
+              sx={{
+                backgroundColor: theme.palette.scene.background,
+                borderRadius: '5px',
+                padding: '12px',
+              }}
+            >
             Please login to get access to your files on GitHub
-          </Typography>
-          }
+            </Typography>
+          )}
           <Box
             sx={{
               marginTop: '1em',
               fontSize: '.8em',
             }}
           >
-            * Local files cannot yet be saved or shared.
+            Only Hosts can change or upload files.
+          </Box>
+          <Box
+            sx={{
+              marginTop: '1em',
+              fontSize: '.8em',
+            }}
+          >
+          * Local files cannot yet be saved or shared.
           </Box>
         </Box>
       }

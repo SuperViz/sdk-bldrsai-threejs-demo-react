@@ -36,6 +36,7 @@ import {initializeSupervizSDK,
   SDK_SYNC_DESELECT_ITEMS,
   CONTENT_SYNC_CHANGE_MODEL,
   onContentChanged,
+  syncContent,
   userId} from '../../public/static/js/superviz/supervizInitialize'
 import {getPlaneSceneInfo} from '../../src/Components/CutPlaneMenu'
 import {Vector3} from 'three'
@@ -179,7 +180,7 @@ export default function CadView({
       await superviz.subscribe(SDK_SYNC_PLANE_SELECTED, function(selectedId) {
         navigate(selectedId)
       })
-      await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_JOINED, function(payload) {
+      await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_JOINED, function() {
         clipper()
       })
       await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MEETING_HOST_CHANGE, function(payload) {
@@ -283,8 +284,7 @@ export default function CadView({
       viewer.isolator.unHideAllElements()
       viewer.isolator.hideElementsById(previouslyHiddenELements)
     }
-
-    if (modelUuid !== null) {
+    if (superviz && modelUuid !== null) {
       onContentChanged(viewer)
       clipper()
     }
@@ -392,6 +392,7 @@ export default function CadView({
           const parts = ifcUrl.split('/')
           ifcUrl = parts[parts.length - 1]
           window.removeEventListener('beforeunload', handleBeforeUnload)
+          syncContent(`${appPrefix}/v/new/${ifcUrl}.ifc`)
           navigate(`${appPrefix}/v/new/${ifcUrl}.ifc`)
         },
         false,

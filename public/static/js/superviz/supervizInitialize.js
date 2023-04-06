@@ -1,7 +1,6 @@
 import SuperVizSdk, {MeetingEvent} from '@superviz/sdk'
 import {ThreeJsPlugin} from '@superviz/threejs-plugin'
-
-// import * as process from 'node:process'
+import useStore from '../../../../src/store/useStore'
 
 // eslint-disable-next-line no-magic-numbers
 export const userId = Date.now().toPrecision(20)
@@ -11,15 +10,14 @@ export const SDK_SYNC_DESELECT_ITEMS = 'sdkSyncDeselectItems'
 export let superviz = null
 export const CONTENT_SYNC_CHANGE_MODEL = 'changeModel'
 
-
-const DEVELOPER_KEY = process.env.SUPERVIZ_DEVELOPER_TOKEN
-const nameUser = 'nome'
-const typeUser = 'host'
+// TODO: Remove superviz sdk to ENV
+const DEVELOPER_KEY = '<SUPERVIZ_API_KEY>'
 
 /**
  * initialize superviz SDK
  */
 export async function initializeSupervizSDK() {
+  const meetingStats = useStore.getState().meetingStats
   superviz = await SuperVizSdk.init(DEVELOPER_KEY, {
     group: {
       id: '<GROUP-ID>',
@@ -27,10 +25,10 @@ export async function initializeSupervizSDK() {
     },
     participant: {
       id: userId,
-      name: nameUser,
-      type: typeUser,
+      name: meetingStats.userName,
+      type: meetingStats.userType,
     },
-    roomId: 'vinicius',
+    roomId: meetingStats.roomId,
     defaultAvatars: true,
     enableFollow: true,
     enableGoTo: true,
