@@ -10,6 +10,7 @@ import {addHashParams, getHashParams, getObjectParams, removeHashParams} from '.
 import {floatStrTrim, isNumeric} from '../utils/strings'
 import {TooltipIconButton} from './Buttons'
 import CutPlaneIcon from '../assets/icons/CutPlane.svg'
+import {isHost} from '../Containers/CadView'
 
 
 const PLANE_PREFIX = 'p'
@@ -39,10 +40,19 @@ export default function CutPlaneMenu() {
 
 
   const handleClick = (event) => {
-    setAnchorEl(event.currentTarget)
+    if (isHost) {
+      startPlane()
+    // setAnchorEl(event.currentTarget)
+    }
   }
 
-
+  const startPlane = async () => {
+    if (viewer.clipper.context.clippingPlanes.length === 0) {
+      await togglePlane({direction: 'x'})
+      await togglePlane({direction: 'y'})
+      await togglePlane({direction: 'z'})
+    }
+  }
   const handleClose = () => {
     setAnchorEl(null)
   }
@@ -79,7 +89,8 @@ export default function CutPlaneMenu() {
       removeHashParams(window.location, PLANE_PREFIX, [direction])
       removeCutPlaneDirection(direction)
       viewer.clipper.deleteAllPlanes()
-      const restCutPlanes = cutPlanes.filter((cutPlane) => cutPlane.direction !== direction)
+      // const restCutPlanes = cutPlanes.filter((cutPlane) => cutPlane.direction !== direction)
+      const restCutPlanes = cutPlanes
       restCutPlanes.forEach((restCutPlane) => {
         const planeInfo = getPlaneSceneInfo({modelCenter, direction: restCutPlane.direction, offset: restCutPlane.offset})
         viewer.clipper.createFromNormalAndCoplanarPoint(planeInfo.normal, planeInfo.modelCenterOffset)

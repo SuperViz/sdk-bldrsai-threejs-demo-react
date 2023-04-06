@@ -5,6 +5,9 @@ import debug from './utils/debug'
 import {useAuth0} from '@auth0/auth0-react'
 import useStore from './store/useStore'
 import * as Sentry from '@sentry/react'
+import Index from './Containers/Index'
+import Invite from './Containers/Invite'
+import Guest from './Containers/Guest'
 
 
 const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes)
@@ -37,7 +40,7 @@ export default function BaseRoutes({testElt = null}) {
         location.pathname === basePath) {
       debug().log('BaseRoutes#useEffect[], forwarding to: ', `${installPrefix }/share`)
 
-      let targetURL = `${installPrefix}/share`
+      let targetURL = location.pathname === '/' ? '/home' : `${installPrefix}/share`
       if (location.search !== '') {
         targetURL += location.search
       }
@@ -45,7 +48,6 @@ export default function BaseRoutes({testElt = null}) {
       if (location.hash !== '') {
         targetURL += location.hash
       }
-
       navigation(targetURL)
     }
 
@@ -70,6 +72,33 @@ export default function BaseRoutes({testElt = null}) {
   return (
     <SentryRoutes>
       <Route path={basePath} element={<Outlet/>}>
+        <Route
+          exact
+          path="home/*"
+          element={
+            <Index
+              installPrefix={installPrefix}
+            />
+          }
+        />
+        <Route
+          exact
+          path="home/invite/*"
+          element={
+            <Invite
+              installPrefix={installPrefix}
+            />
+          }
+        />
+        <Route
+          exact
+          path="home/guest/*"
+          element={
+            <Guest
+              installPrefix={installPrefix}
+            />
+          }
+        />
         <Route
           path="share/*"
           element={

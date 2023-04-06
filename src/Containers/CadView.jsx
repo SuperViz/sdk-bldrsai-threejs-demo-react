@@ -25,17 +25,35 @@ import {handleBeforeUnload} from '../utils/event'
 import {getDownloadURL, parseGitHubRepositoryURL} from '../utils/GitHub'
 import SearchIndex from './SearchIndex'
 import {usePlaceMark} from '../hooks/usePlaceMark'
-import {getAllHashParams} from '../utils/location'
+import {initializeSupervizSDK,
+  loadPluginSupervizSDK,
+  syncSdkScene,
+  syncSdkPlane,
+  syncSdkDeselectItems,
+  superviz,
+  SDK_SYNC_PLANE_SELECTED,
+  SDK_SYNC_CUT_PLANES,
+  SDK_SYNC_DESELECT_ITEMS,
+  CONTENT_SYNC_CHANGE_MODEL,
+  onContentChanged,
+  syncContent,
+  userId} from '../../public/static/js/superviz/supervizInitialize'
+import {getPlaneSceneInfo} from '../../src/Components/CutPlaneMenu'
+import {Vector3} from 'three'
+import {addHashParams, removeHashParams} from '../utils/location'
 
 
+export let isHost = false
 /**
  * Experimenting with a global. Just calling #indexElement and #clear
  * when new models load.
  */
 export const searchIndex = new SearchIndex()
+
+const PLANE_PREFIX = 'p'
 let count = 0
-
-
+let viewer = null
+let modelUuid = null
 /**
  * Only container for the for the app.  Hosts the IfcViewer as well as
  * nav components.
@@ -69,8 +87,9 @@ export default function CadView({
   const [isLoading, setIsLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState()
   const [model, setModel] = useState(null)
-  const viewer = useStore((state) => state.viewer)
+  viewer = useStore((state) => state.viewer)
   const setViewer = useStore((state) => state.setViewer)
+  const setViewerStore = useStore((state) => state.setViewerStore)
   const isNavPanelOpen = useStore((state) => state.isNavPanelOpen)
   const isDrawerOpen = useStore((state) => state.isDrawerOpen)
   const setCutPlaneDirections = useStore((state) => state.setCutPlaneDirections)
@@ -80,18 +99,26 @@ export default function CadView({
   const setSelectedElement = useStore((state) => state.setSelectedElement)
   const setSelectedElements = useStore((state) => state.setSelectedElements)
   const selectedElements = useStore((state) => state.selectedElements)
-  const setViewerStore = useStore((state) => state.setViewerStore)
+  // const setNavigationStore = useStore((state) => state.setNavigationStore)
   const snackMessage = useStore((state) => state.snackMessage)
+  // const repository = useStore((state) => state.repository)
+  // const cutPlanes = useStore((state) => state.cutPlanes)
+  // const addCutPlaneDirection = useStore((state) => state.addCutPlaneDirection)
   const accessToken = useStore((state) => state.accessToken)
   const sidebarWidth = useStore((state) => state.sidebarWidth)
   const [modelReady, setModelReady] = useState(false)
   const isMobile = useIsMobile()
   const location = useLocation()
+  // const superviz = null
+
+  // initialize cutplane to sync object cut plane
+  const cutPlanes = useStore((state) => state.cutPlanes)
+  const removeCutPlaneDirection = useStore((state) => state.removeCutPlaneDirection)
+  const addCutPlaneDirection = useStore((state) => state.addCutPlaneDirection)
 
   // Granular visibility controls for the UI components
   const isSearchBarVisible = useStore((state) => state.isSearchBarVisible)
   const isNavigationPanelVisible = useStore((state) => state.isNavigationPanelVisible)
-
 
   // Place Mark
   const {createPlaceMark, onSceneSingleTap, onSceneDoubleTap} = usePlaceMark()
@@ -144,6 +171,39 @@ export default function CadView({
     })()
   }, [selectedElements])
 
+  // Superviz SDK initialize
+  useEffect(() => {
+    ( async () => {
+      await initializeSupervizSDK()
+      const viewerState = useStore.getState().viewer
+      await loadPluginSupervizSDK(viewerState)
+      await superviz.subscribe(SDK_SYNC_PLANE_SELECTED, function(selectedId) {
+        navigate(selectedId)
+      })
+      await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_JOINED, function() {
+        clipper()
+      })
+      await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MEETING_HOST_CHANGE, function(payload) {
+        deselectItems()
+        isHost = payload.id === userId
+      })
+      await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_UPDATED, function(payload) {
+        isHost = payload.isHost
+      })
+      await superviz.subscribe(SDK_SYNC_DESELECT_ITEMS, function() {
+        if (!isHost) {
+          deselectItems()
+        }
+      })
+      // change model
+      await superviz.subscribe(CONTENT_SYNC_CHANGE_MODEL, function(newModel) {
+        if (!isHost) {
+          navigate({pathname: newModel})
+        }
+        superviz.unloadPlugin()
+      })
+    })()
+  }, [])
 
   // Watch for path changes within the model.
   // TODO(pablo): would be nice to have more consistent handling of path parsing.
@@ -159,7 +219,6 @@ export default function CadView({
     }
   }, [location, model])
   /* eslint-enable */
-
 
   /**
    * Begin setup for new model. Turn off nav, search and item and init
@@ -180,7 +239,6 @@ export default function CadView({
     initViewerCb(undefined, theme)
     theme.addThemeChangeListener(initViewerCb)
   }
-
 
   /** When viewer is ready, load IFC model. */
   async function onViewer() {
@@ -208,7 +266,6 @@ export default function CadView({
       viewer.IFC.selector.preselection.material = preselectMat
       viewer.IFC.selector.selection.material = selectMat
     }
-
     const pathToLoad = modelPath.gitpath || (installPrefix + modelPath.filepath)
     const tmpModelRef = await loadIfc(pathToLoad)
     debug().log('CadView#onViewer: tmpModelRef: ', tmpModelRef)
@@ -227,6 +284,11 @@ export default function CadView({
       viewer.isolator.unHideAllElements()
       viewer.isolator.hideElementsById(previouslyHiddenELements)
     }
+    if (superviz && modelUuid !== null) {
+      onContentChanged(viewer)
+      clipper()
+    }
+    modelUuid = tmpModelRef
   }
 
 
@@ -284,7 +346,7 @@ export default function CadView({
           }
         },
         (error) => {
-          debug().log('CadView#loadIfc$onError: ', error)
+          // console.warn('CadView#loadIfc$onError', error)
           // TODO(pablo): error modal.
           setIsLoading(false)
           setAlertMessage(`Could not load file: ${filepath}`)
@@ -330,6 +392,7 @@ export default function CadView({
           const parts = ifcUrl.split('/')
           ifcUrl = parts[parts.length - 1]
           window.removeEventListener('beforeunload', handleBeforeUnload)
+          syncContent(`${appPrefix}/v/new/${ifcUrl}.ifc`)
           navigate(`${appPrefix}/v/new/${ifcUrl}.ifc`)
         },
         false,
@@ -421,15 +484,46 @@ export default function CadView({
     setLevelInstance(null)
   }
 
+  /**
+   *
+   */
+  function clipper() {
+    superviz.subscribe(SDK_SYNC_CUT_PLANES, (async (content) => {
+      if (!isHost) {
+        if (viewer.clipper.context.clippingPlanes.length === 0) {
+          await initializePlane({direction: 'x'})
+          await initializePlane({direction: 'y'})
+          await initializePlane({direction: 'z'})
+        }
+        viewer.clipper.context.clippingPlanes[0].constant = content[0]
+        viewer.clipper.context.clippingPlanes[1].constant = content[1]
+        viewer.clipper.context.clippingPlanes[2].constant = content[2]
+      }
+    }))
+    // Highlight items when hovering over them
+    const plane = []
+    window.onmousemove = (event) => {
+      if (viewer && isHost) {
+        if (viewer.clipper.context.clippingPlanes.length > 0 && plane !== viewer.clipper.context.clippingPlanes) {
+          plane[0] = viewer.clipper.context.clippingPlanes[0].constant
+          plane[1] = viewer.clipper.context.clippingPlanes[1].constant
+          plane[2] = viewer.clipper.context.clippingPlanes[2].constant
+          syncSdkPlane(plane)
+        }
+      }
+    }
+  }
+
   /** Deselect active scene elts and remove clip planes. */
   function deselectItems() {
+    if (isHost) {
+      syncSdkDeselectItems()
+    }
     if (viewer) {
       viewer.clipper.deleteAllPlanes()
     }
     resetState()
-    const repoFilePath = modelPath.gitpath ? modelPath.getRepoPath() : modelPath.filepath
     window.removeEventListener('beforeunload', handleBeforeUnload)
-    navigate(`${pathPrefix}${repoFilePath}`)
   }
 
   /**
@@ -445,16 +539,15 @@ export default function CadView({
     try {
       // Update The Component state
       setSelectedElements(resultIDs.map((id) => `${id}`))
-
       // Sets the url to the last selected element path.
       if (resultIDs.length > 0 && updateNavigation) {
         const lastId = resultIDs.slice(-1)
         const pathIds = getPathIdsForElements(lastId)
         const repoFilePath = modelPath.gitpath ? modelPath.getRepoPath() : modelPath.filepath
         const path = pathIds.join('/')
-        const curHashParams = getAllHashParams()
-        debug().log('CadView#selectItemsInScene: curHashParams: ', curHashParams)
-        navigate(`${pathPrefix}${repoFilePath}/${path}#${curHashParams}`)
+        navigate(`${pathPrefix}${repoFilePath}/${path}`)
+        const contentPath = `${pathPrefix}${repoFilePath}/${path}`
+        syncSdkScene(contentPath)
       }
     } catch (e) {
       // IFCjs will throw a big stack trace if there is not a visual
@@ -566,7 +659,36 @@ export default function CadView({
       }
     }
   }
+  /** initialize plane to sync */
+  const initializePlane = ({direction, offset = 0}) => {
+    setLevelInstance(null)
+    const modelCenter = new Vector3
+    model?.geometry.boundingBox.getCenter(modelCenter)
+    // setAnchorEl(null)
+    const {normal, modelCenterOffset} = getPlaneSceneInfo({modelCenter, direction, offset})
+    debug().log('CutPlaneMenu#togglePlane: normal: ', normal)
+    debug().log('CutPlaneMenu#togglePlane: modelCenterOffset: ', modelCenterOffset)
+    debug().log('CutPlaneMenu#togglePlane: ifcPlanes: ', viewer.clipper.planes)
 
+    if (cutPlanes.findIndex((cutPlane) => cutPlane.direction === direction) > -1) {
+      debug().log('CutPlaneMenu#togglePlane: found: ', true)
+      removeHashParams(window.location, PLANE_PREFIX, [direction])
+      removeCutPlaneDirection(direction)
+      viewer.clipper.deleteAllPlanes()
+      // const restCutPlanes = cutPlanes.filter((cutPlane) => cutPlane.direction !== direction)
+      const restCutPlanes = cutPlanes
+
+      restCutPlanes.forEach((restCutPlane) => {
+        const planeInfo = getPlaneSceneInfo({modelCenter, direction: restCutPlane.direction, offset: restCutPlane.offset})
+        viewer.clipper.createFromNormalAndCoplanarPoint(planeInfo.normal, planeInfo.modelCenterOffset)
+      })
+    } else {
+      debug().log('CutPlaneMenu#togglePlane: found: ', false)
+      addHashParams(window.location, PLANE_PREFIX, {[direction]: offset}, true)
+      addCutPlaneDirection({direction, offset})
+      viewer.clipper.createFromNormalAndCoplanarPoint(normal, modelCenterOffset)
+    }
+  }
 
   const windowDimensions = useWindowDimensions()
   const spacingBetweenSearchAndOpsGroupPx = 20
@@ -662,7 +784,6 @@ export default function CadView({
  */
 function OperationsGroupAndDrawer({deselectItems}) {
   const isMobile = useIsMobile()
-
   return (
     isMobile ? (
       <>
@@ -719,24 +840,24 @@ function initViewer(pathPrefix, backgroundColorStr = '#abcdef') {
 
   // Clear any existing scene.
   container.textContent = ''
-  const viewer = new IfcViewerAPIExtended({
+  const v = new IfcViewerAPIExtended({
     container,
     backgroundColor: new Color(backgroundColorStr),
   })
-  debug().log('CadView#initViewer: viewer created:', viewer)
+  debug().log('CadView#initViewer: viewer created:', v)
 
   // Path to web-ifc.wasm in serving directory.
-  viewer.IFC.setWasmPath('./static/js/')
-  viewer.clipper.active = true
-  viewer.clipper.orthogonalY = false
+  v.IFC.setWasmPath('./static/js/')
+  v.clipper.active = true
+  v.clipper.orthogonalY = false
 
   // Highlight items when hovering over them
   window.onmousemove = (event) => {
-    viewer.highlightIfcItem()
+    v.prePickIfcItem()
   }
 
-  viewer.container = container
-  return viewer
+  v.container = container
+  return v
 }
 
 

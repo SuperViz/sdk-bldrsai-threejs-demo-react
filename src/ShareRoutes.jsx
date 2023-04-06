@@ -91,7 +91,8 @@ function Forward({appPrefix}) {
 
   useEffect(() => {
     if (location.pathname === appPrefix) {
-      const dest = `${appPrefix}/v/p`
+      let dest = ''
+      dest = appPrefix === '/home' ? `${appPrefix}/index` : dest = `${appPrefix}/v/p`
       debug().log('ShareRoutes#useEffect[location]: forwarding to: ', dest)
       window.removeEventListener('beforeunload', handleBeforeUnload)
       navigate(dest)

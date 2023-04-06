@@ -100,9 +100,8 @@ module.exports = {
     'jsdoc/require-param-type': 'off',
     'require-await': 'error',
     'linebreak-style': ['error', 'unix'],
-    'no-console': 'error',
-    'no-alert': 'error',
-    'no-debugger': 'error'
+    // 'no-console': 'error',
+    'no-debugger': 'error',
   },
   settings: {
     react: {
