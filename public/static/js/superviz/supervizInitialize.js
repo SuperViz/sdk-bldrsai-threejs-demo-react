@@ -1,17 +1,20 @@
-import SuperVizSdk, {MeetingEvent} from '@superviz/sdk'
+import SuperVizSdk, {MeetingEvent, RealtimeEvent} from '@superviz/sdk'
 import {ThreeJsPlugin} from '@superviz/threejs-plugin'
 import useStore from '../../../../src/store/useStore'
+import {isHost} from '../../../../src/Containers/CadView'
 
 // eslint-disable-next-line no-magic-numbers
-export const userId = Date.now().toPrecision(20)
+export const myParticipantId = Date.now().toPrecision(20)
 export const SDK_SYNC_PLANE_SELECTED = 'sdkSyncPlaneSelected'
 export const SDK_SYNC_CUT_PLANES = 'sdkSyncCutPlanes'
 export const SDK_SYNC_DESELECT_ITEMS = 'sdkSyncDeselectItems'
 export let superviz = null
 export const CONTENT_SYNC_CHANGE_MODEL = 'changeModel'
+export const CONTENT_SYNC_CAMERA_POSITION = 'cameraPosition'
 
 // TODO: Remove superviz sdk to ENV
 const DEVELOPER_KEY = '<SUPERVIZ_API_KEY>'
+let cameraControls = ''
 
 /**
  * initialize superviz SDK
@@ -24,7 +27,7 @@ export async function initializeSupervizSDK() {
       name: '<GROUP-NAME>',
     },
     participant: {
-      id: userId,
+      id: myParticipantId,
       name: meetingStats.userName,
       type: meetingStats.userType,
     },
@@ -41,13 +44,16 @@ export async function initializeSupervizSDK() {
  *  load Plugin Superviz SDK
  */
 export async function loadPluginSupervizSDK(viewer, load = null) {
-  const scene = viewer.context.scene.scene
-  const camera = viewer.context.ifcCamera.perspectiveCamera
+  const scene = viewer.IFC.context.scene.scene
+  const camera = viewer.IFC.context.ifcCamera.perspectiveCamera
   const player = camera
+
+  cameraControls = viewer.IFC.context.ifcCamera.cameraControls
   const plugin = new ThreeJsPlugin(scene, camera, player)
 
+  let supervizPlugin = null
   const loadPlugin = () => {
-    superviz.loadPlugin(plugin, {
+    supervizPlugin = superviz.loadPlugin(plugin, {
       avatarConfig: {
         height: 0,
         scale: 10,
@@ -60,6 +66,7 @@ export async function loadPluginSupervizSDK(viewer, load = null) {
       renderLocalAvatar: true,
     })
   }
+
   if (load) {
     loadPlugin()
   }
@@ -68,12 +75,55 @@ export async function loadPluginSupervizSDK(viewer, load = null) {
     loadPlugin()
   })
 
+  await superviz.subscribe(RealtimeEvent.REALTIME_FOLLOW_PARTICIPANT, (followParticipantId) => {
+    cameraControls.enabled = ((followParticipantId === undefined || followParticipantId === myParticipantId))
+  })
+
+  await superviz.subscribe(RealtimeEvent.REALTIME_GATHER, () => {
+    cameraControls.enabled = false
+    if (isHost) {
+      const payload = {
+        position: cameraControls.camera.position,
+      }
+      syncCameraPosition(payload)
+    }
+  })
+
+  await superviz.subscribe(CONTENT_SYNC_CAMERA_POSITION, function(cameraPosition) {
+    if (!isHost) {
+      cameraControls.setPosition(cameraPosition.position.x, cameraPosition.position.y, cameraPosition.position.z)
+    }
+    cameraControls.enabled = true
+  })
+
+  await superviz.subscribe(RealtimeEvent.REALTIME_GO_TO_PARTICIPANT, (goToUserId) => {
+    cameraControls.enabled = false
+    const participantsOn3D = supervizPlugin.getParticipantsOn3D()
+    const goToParticipant = participantsOn3D.find((participantOn3D) => {
+      if (goToUserId === participantOn3D?.id) {
+        return participantOn3D?.position
+      }
+    },
+    )
+    if (goToParticipant?.position) {
+      if (myParticipantId !== goToUserId) {
+        cameraControls.setPosition(goToParticipant.position.x, goToParticipant.position.y, goToParticipant.position.z)
+      }
+      setTimeout(() => {
+        cameraControls.enabled = true
+      // eslint-disable-next-line no-magic-numbers
+      }, 800)
+    }
+  })
+
   await superviz.subscribe(MeetingEvent.MEETING_LEAVE, function() {
     superviz.unloadPlugin()
   })
+
   await superviz.subscribe(MeetingEvent.MY_PARTICIPANT_LEFT, function() {
     superviz.unloadPlugin()
   })
+
   await superviz.subscribe(MeetingEvent.DESTROY, function() {
     superviz.unloadPlugin()
     unsubscribeAllEvents()
@@ -119,6 +169,13 @@ export const syncContent = (newModelSid) => {
 }
 
 /**
+ *  Sync Camera Position
+ */
+const syncCameraPosition = (newCameraPosition) => {
+  superviz.setSyncProperty(CONTENT_SYNC_CAMERA_POSITION, newCameraPosition)
+}
+
+/**
  * unsubiscribe all when destroyed
  */
 function unsubscribeAllEvents() {
@@ -126,10 +183,16 @@ function unsubscribeAllEvents() {
   superviz.unsubscribe(SDK_SYNC_PLANE_SELECTED)
   superviz.unsubscribe(SDK_SYNC_DESELECT_ITEMS)
   superviz.unsubscribe(CONTENT_SYNC_CHANGE_MODEL)
+  superviz.unsubscribe(CONTENT_SYNC_CAMERA_POSITION)
+
   superviz.unsubscribe(MeetingEvent.MY_PARTICIPANT_JOINED)
   superviz.unsubscribe(MeetingEvent.MEETING_LEAVE)
   superviz.unsubscribe(MeetingEvent.MY_PARTICIPANT_LEFT)
   superviz.unsubscribe(MeetingEvent.MY_PARTICIPANT_UPDATED)
   superviz.unsubscribe(MeetingEvent.MEETING_HOST_CHANGE)
   superviz.unsubscribe(MeetingEvent.DESTROY)
+
+  superviz.unsubscribe(RealtimeEvent.REALTIME_GO_TO_PARTICIPANT)
+  superviz.unsubscribe(RealtimeEvent.REALTIME_FOLLOW_PARTICIPANT)
+  superviz.unsubscribe(RealtimeEvent.REALTIME_GATHER)
 }
