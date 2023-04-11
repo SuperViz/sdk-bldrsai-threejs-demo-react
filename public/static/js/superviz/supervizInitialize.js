@@ -13,7 +13,7 @@ export const CONTENT_SYNC_CHANGE_MODEL = 'changeModel'
 export const CONTENT_SYNC_CAMERA_POSITION = 'cameraPosition'
 
 // TODO: Remove superviz sdk to ENV
-const DEVELOPER_KEY = '<SUPERVIZ_API_KEY>'
+const DEVELOPER_KEY = 'ypxgtea8rr2edxrnr1200ji117oc59'
 let cameraControls = ''
 
 /**
@@ -62,7 +62,7 @@ export async function loadPluginSupervizSDK(viewer, load = null) {
       isAvatarsEnabled: true,
       isLaserEnabled: true,
       isMouseEnabled: true,
-      isNameEnabled: true,
+      isNameEnabled: false,
       renderLocalAvatar: true,
     })
   }
