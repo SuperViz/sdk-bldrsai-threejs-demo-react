@@ -27,7 +27,7 @@ export default function Invite({
       const userType = url.searchParams.get('user-type')
       const userName = url.searchParams.get('user-name')
       const roomId = url.searchParams.get('room-id')
-      document.getElementById('room-id').value = `http://localhost:8080/home/guest?room-id=${roomId}&user-type=guest`
+      document.getElementById('room-id').value = `${url.origin}/home/guest?room-id=${roomId}&user-type=guest`
       const payload = {
         userType,
         userName,
