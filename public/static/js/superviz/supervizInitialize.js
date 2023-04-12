@@ -60,10 +60,10 @@ export async function loadPluginSupervizSDK(viewer, load = null) {
         laserOrigin: {x: 0, y: 0, z: 0},
       },
       isAvatarsEnabled: true,
-      isLaserEnabled: true,
+      isLaserEnabled: false,
       isMouseEnabled: true,
       isNameEnabled: false,
-      renderLocalAvatar: true,
+      renderLocalAvatar: false,
     })
   }
 

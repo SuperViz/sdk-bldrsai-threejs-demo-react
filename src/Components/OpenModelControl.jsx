@@ -104,11 +104,11 @@ function OpenModelDialog({isDialogDisplayed, setIsDialogDisplayed, fileOpen, org
   const fileName = filesArr[selectedFileName]
 
   const openFile = () => {
-    if (!isHost) {
-      return
-    }
-    fileOpen()
-    setIsDialogDisplayed(false)
+    // if (!isHost) {
+    //   return
+    // }
+    // fileOpen()
+    // setIsDialogDisplayed(false)
   }
 
   const selectOrg = async (org) => {
@@ -143,9 +143,10 @@ function OpenModelDialog({isDialogDisplayed, setIsDialogDisplayed, fileOpen, org
       headerText={'Open'}
       isDialogDisplayed={isDialogDisplayed}
       setIsDialogDisplayed={setIsDialogDisplayed}
-      actionTitle={'Open local file'}
-      actionIcon={<UploadIcon/>}
+      actionTitle={''}
+      actionIcon={null}
       actionCb={openFile}
+      showButton={false}
       content={
         <Box
           sx={{
@@ -200,16 +201,16 @@ function OpenModelDialog({isDialogDisplayed, setIsDialogDisplayed, fileOpen, org
               fontSize: '.8em',
             }}
           >
-            Only Hosts can change or upload files.
+            Only Hosts can change files.
           </Box>
-          <Box
+          {/* <Box
             sx={{
               marginTop: '1em',
               fontSize: '.8em',
             }}
           >
           * Local files cannot yet be saved or shared.
-          </Box>
+          </Box> */}
         </Box>
       }
     />
