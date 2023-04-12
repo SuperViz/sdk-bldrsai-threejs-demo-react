@@ -29,6 +29,7 @@ export default function Dialog({
   actionTitle,
   actionCb,
   actionIcon,
+  showButton,
 }) {
   assertDefined(
       icon, headerText, isDialogDisplayed, setIsDialogDisplayed, content,
@@ -80,8 +81,9 @@ export default function Dialog({
           display: 'flex',
           justifyContent: 'center',
         }}
-      >
+      >{ showButton &&
         <RectangularButton title={actionTitle} icon={actionIcon} onClick={actionCb}/>
+        }
       </DialogActions>
     </MuiDialog>
   )
