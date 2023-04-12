@@ -76,7 +76,7 @@ export async function loadPluginSupervizSDK(viewer, load = null) {
   })
 
   await superviz.subscribe(RealtimeEvent.REALTIME_FOLLOW_PARTICIPANT, (followParticipantId) => {
-    cameraControls.enabled = ((followParticipantId === undefined || followParticipantId === myParticipantId))
+    cameraControls.enabled = ((Object.keys(followParticipantId).length === 0 || followParticipantId === myParticipantId))
   })
 
   await superviz.subscribe(RealtimeEvent.REALTIME_GATHER, () => {
