@@ -52,7 +52,7 @@ export default function Invite({
         setTimeout(function() {
           document.getElementById('check-copy').checked = false
         // eslint-disable-next-line no-magic-numbers
-        }, 3000)
+        }, 1000)
       })
     })()
   }, [setMeetingStats, appPrefix])
