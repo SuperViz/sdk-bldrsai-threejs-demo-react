@@ -2513,10 +2513,10 @@
   dependencies:
     debug "^4.3.4"
 
-"@superviz/sdk@3.2.2":
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/@superviz/sdk/-/sdk-3.2.2.tgz#5af602ada59b5ad392be1962bb8335a0a575d2ca"
-  integrity sha512-fdsfLDk31yCxBSPJ4AUCgUHum1Aoga+Yfj5JQ5zVMBEmnRhVvhs9iYWkKHw1qKJxAmFeGQcKe+6mAA0/bprL7w==
+"@superviz/sdk@4.3.1":
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/@superviz/sdk/-/sdk-4.3.1.tgz#906683532f463e4af5341ed9bc7030f948dd37dc"
+  integrity sha512-vRSzoXnzWdfzIAntzjrMhJ2ymPFYWGIg0QGS6QoT7EdNvCQPhLMjN0hH1+KJ1/ThIcjJ6q2FTwqBKwOmAvblBg==
   dependencies:
     "@superviz/immersive-core" "^0.3.1"
     "@types/jest" "^28.1.3"
@@ -2532,10 +2532,10 @@
     nosleep.js "^0.12.0"
     semantic-release-version-file "^1.0.2"
 
-"@superviz/threejs-plugin@0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@superviz/threejs-plugin/-/threejs-plugin-0.11.0.tgz#0c62a5e0e39fc8bd53f71b9c5a6bbfa44023267b"
-  integrity sha512-x4D6orSNLCOT6GloixHbibtm6z5l00s9gdatWqglCiwp+yG+aRLgSQxueV5lhAvxd+Bx++4jqhWzUWnwDqLLRQ==
+"@superviz/threejs-plugin@beta":
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@superviz/threejs-plugin/-/threejs-plugin-0.11.1.tgz#95be122753404e220ad6f86723ec8d20dbe225ed"
+  integrity sha512-b+/l2iUpvlerUThHlPsgUfOY9U6EFEZk1brw7hphxhIuvgUbzxWudjsv455ydwtbkevHzPDmwR2pxHFZ/nsa0w==
   dependencies:
     three "^0.147.0"
     three-mesh-bvh "^0.5.23"

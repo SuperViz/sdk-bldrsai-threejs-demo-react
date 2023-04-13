@@ -56,13 +56,13 @@ export async function loadPluginSupervizSDK(viewer, load = null) {
     supervizPlugin = superviz.loadPlugin(plugin, {
       avatarConfig: {
         height: 0,
-        scale: 10,
+        scale: 30,
         laserOrigin: {x: 0, y: 0, z: 0},
       },
       isAvatarsEnabled: true,
       isLaserEnabled: false,
       isMouseEnabled: true,
-      isNameEnabled: false,
+      isNameEnabled: true,
       renderLocalAvatar: false,
     })
   }
