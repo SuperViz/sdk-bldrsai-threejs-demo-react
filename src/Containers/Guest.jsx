@@ -68,7 +68,7 @@ export default function Guest({
             <div className="box-side-guest">
               <div className="image-size">
                 <sv-demo-guest-image className="image-size" id="sv-demo-guest-image"
-                  name="https://production.cdn.superviz.com/static/bg-guest.png"
+                  name="https://production.cdn.superviz.com/static/bldrs-demo/demo-bldr-invite-bkg.png"
                 />
               </div>
             </div>
