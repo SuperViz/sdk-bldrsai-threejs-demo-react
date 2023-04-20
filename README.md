@@ -68,12 +68,7 @@ To start the demo you must fill in the fields below:
 
 
 
-### Example:
-
-![image](https://user-images.githubusercontent.com/49524331/202759577-562ed255-49fd-4dd8-826d-2babb2b59522.png)
-
-
-# BLDRS:
+### Example BLDRS:
 
 <img width="1430" alt="image" src="https://user-images.githubusercontent.com/2480879/209037130-43d1d04e-d943-452c-93fc-2d556c4f17be.png">
 
