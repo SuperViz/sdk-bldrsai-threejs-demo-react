@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8" />
-  <meta name="description" content="Build every thing together: Collab and Share 3d models online" />
+  <meta name="description" content="Integrate SuperViz into Open Source IFC viewer." />
   <meta name="keywords" content="ifc, ifc viewer, cad viewer, share ifc, share model, open source" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
@@ -21,9 +21,17 @@
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
 	<meta charset="UTF-8">
-	<title>Superviz DEMO</title>
+	<title>Integrate SuperViz into Open Source IFC viewer.</title>
 	<link rel="stylesheet" href="https://production.storage.superviz.com/demos/assets/css/main.css">
 	<script type="module" src="https://production.storage.superviz.com/demos/components/index.js"></script>
+  <script type="module" src="https://production.storage.superviz.com/demos/assets/js/production/amplitude.js"></script>
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', () => {
+			amplitude.track("Open example", {
+				exampleName: "sdk-bldrsai-threejs-demo-react",
+			});
+		});
+	</script>
   <!-- Start Single Page Apps for GitHub Pages -->
   <script type="text/javascript">
       // Single Page Apps for GitHub Pages

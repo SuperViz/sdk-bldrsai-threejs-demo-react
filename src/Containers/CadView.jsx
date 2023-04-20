@@ -99,17 +99,12 @@ export default function CadView({
   const setSelectedElement = useStore((state) => state.setSelectedElement)
   const setSelectedElements = useStore((state) => state.setSelectedElements)
   const selectedElements = useStore((state) => state.selectedElements)
-  // const setNavigationStore = useStore((state) => state.setNavigationStore)
   const snackMessage = useStore((state) => state.snackMessage)
-  // const repository = useStore((state) => state.repository)
-  // const cutPlanes = useStore((state) => state.cutPlanes)
-  // const addCutPlaneDirection = useStore((state) => state.addCutPlaneDirection)
   const accessToken = useStore((state) => state.accessToken)
   const sidebarWidth = useStore((state) => state.sidebarWidth)
   const [modelReady, setModelReady] = useState(false)
   const isMobile = useIsMobile()
   const location = useLocation()
-  // const superviz = null
 
   // initialize cutplane to sync object cut plane
   const cutPlanes = useStore((state) => state.cutPlanes)

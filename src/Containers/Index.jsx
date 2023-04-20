@@ -48,7 +48,7 @@ export default function Index() {
           <sv-demo-logo name="https://production.cdn.superviz.com/static/superviz-white-logo.svg"/>
           <div className="content-wrapper">
             <div className="text-side">
-              <sv-demo-title-left name="BLDRS example: Change project during a meeting."/>
+              <sv-demo-title-left name="Integrate SuperViz into Open Source IFC viewer."/>
             </div>
             <div className="box-side">
               <sv-demo-title-right name="Add your name to get started"/>

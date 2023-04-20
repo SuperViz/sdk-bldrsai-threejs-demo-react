@@ -12,8 +12,7 @@ export let superviz = null
 export const CONTENT_SYNC_CHANGE_MODEL = 'changeModel'
 export const CONTENT_SYNC_CAMERA_POSITION = 'cameraPosition'
 
-// TODO: Remove superviz sdk to ENV
-const DEVELOPER_KEY = 'ypxgtea8rr2edxrnr1200ji117oc59'
+const DEVELOPER_KEY = 'SUPERVIZ_DEVELOPER_TOKEN'
 let cameraControls = ''
 
 /**

@@ -14,9 +14,6 @@
 
 Clone the project repository:
 
-```bash
-git@github.com:SuperViz/sdk-demo.git
-```
 GitHub CLI
 ```bash
 gh repo clone SuperViz/sdk-bldrsai-threejs-demo-react
