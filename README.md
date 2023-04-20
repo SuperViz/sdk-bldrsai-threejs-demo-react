@@ -42,7 +42,11 @@ Using npm
 npm install
 ```
 
-To properly use this project, you will need to open supervizInitialize.js and change the value SUPERVIZ_DEVELOPER_TOKEN to your developer token
+To properly use this project, you will need to open 
+```bash
+/public/static/js/superviz/supervizInitialize.js
+```
+and change the value SUPERVIZ_DEVELOPER_TOKEN to your developer token
 
 After that, the demo is ready to be used. To run the development environment, from root, run:
 
