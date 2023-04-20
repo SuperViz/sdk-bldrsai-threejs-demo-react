@@ -1,4 +1,4 @@
-# SuperViz + Matteport Vue.js DEMO
+# Integrate SuperViz into Open Source IFC viewer. React DEMO
 
 
 <p align="center">
@@ -16,7 +16,19 @@ Clone the project repository:
 
 ```bash
 git@github.com:SuperViz/sdk-demo.git
-```
+
+GitHub CLI
+```bash
+gh repo clone SuperViz/sdk-bldrsai-threejs-demo-react
+
+Ssh
+```bash
+git@github.com:SuperViz/sdk-bldrsai-threejs-demo-react.git
+
+Https
+```bash
+https://github.com/SuperViz/sdk-bldrsai-threejs-demo-react.git
+
 
 From the project root, run `yarn` or `npm` to install the dependencies:
 
@@ -30,19 +42,18 @@ Using npm
 npm install
 ```
 
-To properly use this project, you will need to create an .env file following the example given in .env.example.
-You will also need to set your developer key to the value of the `VITE_SUPERVIZ_DEVELOPER_TOKEN` environment variable in the created file.
+To properly use this project, you will need to open supervizInitialize.js and change the value SUPERVIZ_DEVELOPER_TOKEN to your developer token
 
 After that, the demo is ready to be used. To run the development environment, from root, run:
 
 Using yarn
 ```bash
-yarn dev
+yarn serve-share
 ```
 
 Using npm
 ```bash
-npm run dev
+npm run serve-share
 ```
 
 ## Initializing the demo
@@ -50,9 +61,8 @@ npm run dev
 To start the demo you must fill in the fields below:
 
 * Room id: id of the room that the user will enter;
-* User id: id of the user who will enter the meeting;
-* User name: name of the user who will enter the meeting;
-* Avatar URL: link to avatar model (GLB or GLTF);
+* Participant id: id of the user who will enter the meeting;
+* Participant name: name of the user who will enter the meeting;
 * Avatar scale: the scale of the model;
 * Avatar height: the Y position of the avatar inside the tour;
 * Is host candidate: determines whether the user is allowed to receive the host role;
@@ -66,12 +76,7 @@ To start the demo you must fill in the fields below:
 ![image](https://user-images.githubusercontent.com/49524331/202759577-562ed255-49fd-4dd8-826d-2babb2b59522.png)
 
 
-
-
-
-
-
-
+# BLDRS:
 
 <img width="1430" alt="image" src="https://user-images.githubusercontent.com/2480879/209037130-43d1d04e-d943-452c-93fc-2d556c4f17be.png">
 
