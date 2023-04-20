@@ -35,7 +35,6 @@ export async function initializeSupervizSDK() {
     enableFollow: true,
     enableGoTo: true,
     enableGather: true,
-    environment: 'dev',
   })
 }
 
