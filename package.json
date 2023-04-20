@@ -1,6 +1,6 @@
 {
   "name": "bldrs",
-  "version": "1.0.0-r37",
+  "version": "1.0.0-r39",
   "main": "src/index.jsx",
   "license": "MIT",
   "homepage": "https://github.com/bldrs-ai/Share",
@@ -45,7 +45,7 @@
     "@octokit/rest": "^19.0.3",
     "@sentry/react": "^7.31.1",
     "@sentry/tracing": "^7.31.1",
-    "@superviz/sdk": "4.3.1",
+    "@superviz/sdk": "4.3.2",
     "@superviz/threejs-plugin": "beta",
     "canvas": "^2.11.0",
     "clsx": "^1.2.1",
