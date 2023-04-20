@@ -16,16 +16,19 @@ Clone the project repository:
 
 ```bash
 git@github.com:SuperViz/sdk-demo.git
-
+```
 GitHub CLI
+```bash
 gh repo clone SuperViz/sdk-bldrsai-threejs-demo-react
-
+```
 Ssh
+```bash
 git@github.com:SuperViz/sdk-bldrsai-threejs-demo-react.git
-
+```
 Https
+```bash
 https://github.com/SuperViz/sdk-bldrsai-threejs-demo-react.git
-
+```
 
 From the project root, run `yarn` or `npm` to install the dependencies:
 
