@@ -134,6 +134,7 @@ function ShareDialog({isDialogDisplayed, setIsDialogDisplayed}) {
       actionTitle='Copy Link'
       actionIcon={<CopyIcon/>}
       actionCb={onCopy}
+      showButton={true}
       content={
         <Box sx={{
           display: 'flex',

@@ -22,7 +22,7 @@ export default function AboutControl() {
   const [isDialogDisplayed, setIsDialogDisplayed] = useState(getCookieBoolean({
     component: 'about',
     name: 'isFirstTime',
-    defaultValue: true,
+    defaultValue: false,
   }))
   const setIsDialogDisplayedLocal = (value) => {
     setIsDialogDisplayed(value)
@@ -79,6 +79,7 @@ export function AboutDialog({isDialogDisplayed, setIsDialogDisplayed}) {
       content={<AboutContent setIsDialogDisplayed={setIsDialogDisplayed}/>}
       actionTitle='OK'
       actionCb={() => setIsDialogDisplayed(false)}
+      showButton={true}
     />
   )
 }

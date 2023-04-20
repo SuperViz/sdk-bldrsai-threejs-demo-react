@@ -2513,10 +2513,10 @@
   dependencies:
     debug "^4.3.4"
 
-"@superviz/sdk@4.3.1":
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/@superviz/sdk/-/sdk-4.3.1.tgz#906683532f463e4af5341ed9bc7030f948dd37dc"
-  integrity sha512-vRSzoXnzWdfzIAntzjrMhJ2ymPFYWGIg0QGS6QoT7EdNvCQPhLMjN0hH1+KJ1/ThIcjJ6q2FTwqBKwOmAvblBg==
+"@superviz/sdk@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@superviz/sdk/-/sdk-4.3.2.tgz#2cffba4eedae3cf9004883beae082ab656d2b6d1"
+  integrity sha512-sQfPjlsvWgTNKc6pcL4S1AHuJ9OBzI5ZWMqioLCPpy7+fciE+IjWJj1zWfFo79Lj9a8uT7pCaKGsS8JWB4St4Q==
   dependencies:
     "@superviz/immersive-core" "^0.3.1"
     "@types/jest" "^28.1.3"
