@@ -2,7 +2,7 @@ name: Deploy demo
 on:
   push:
     branches:
-      - main
+#      - main
 jobs:
   main:
     if: "github.ref == 'refs/heads/main'"
