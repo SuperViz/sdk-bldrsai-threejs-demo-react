@@ -57,7 +57,7 @@ Using npm
 npm run serve-share
 ```
 
-### Example BLDRS:
+### Share from Bldrs.io:
 
 Share is a web-based BIM & CAD integration environment from [bldrs.ai](https://bldrs.ai/).
 
