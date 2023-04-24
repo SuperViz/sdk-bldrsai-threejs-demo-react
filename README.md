@@ -57,24 +57,7 @@ Using npm
 npm run serve-share
 ```
 
-## Initializing the demo
-
-To start the demo you must fill in the fields below:
-
-* Room id: id of the room that the user will enter;
-* Participant id: id of the user who will enter the meeting;
-* Participant name: name of the user who will enter the meeting;
-* Avatar scale: the scale of the model;
-* Avatar height: the Y position of the avatar inside the tour;
-* Is host candidate: determines whether the user is allowed to receive the host role;
-* Enable Avatars: enable or disable avatar creation;
-* Enable Pointers: enable or disable pointer (if avatars are disabled, `isPointersEnabled` is forced to false);
-
-
-
 ### Example BLDRS:
-
-<img width="1430" alt="image" src="https://user-images.githubusercontent.com/2480879/209037130-43d1d04e-d943-452c-93fc-2d556c4f17be.png">
 
 Share is a web-based BIM & CAD integration environment from [bldrs.ai](https://bldrs.ai/).
 
@@ -83,18 +66,6 @@ Share is a web-based BIM & CAD integration environment from [bldrs.ai](https://b
 - *Search* the model's elements and properties.
 - *Collaborate* with teammates by commenting on model parts and properties (in development).
 - *Share* with teammates, using permalinks to model parts with exact camera views.
-- *Extend* our platform with your Apps. (in development)
+- *Extend* our platform with your Apps. (in development
 
-# Contributing
-Please join in creating Bldrs!  Come chat with us at the [Bldrs Discord](https://discord.gg/apWHfDtkJs).
-
-If you have ideas or issues, please file them in our GitHub [issues](https://github.com/bldrs-ai/Share/issues) page, or mail info@bldrs.ai.
-
-## Donations 
-If you use Bldrs for private hosting, please contribute to the [Bldrs Open Collective project](https://opencollective.com/bldrs).
-
-## Development
-Bldrs is open source and we'd appreciate your help.
-- [Projects](https://github.com/orgs/bldrs-ai/projects?query=is%3Aopen&type=beta)
-- [Design Doc](https://github.com/bldrs-ai/Share/wiki/Design)
-- [Developer Guide](https://github.com/bldrs-ai/Share/wiki/Dev:-Guide)
+Visit [bldrs.ai](https://bldrs.ai/) for more info.
