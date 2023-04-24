@@ -66,6 +66,6 @@ Share is a web-based BIM & CAD integration environment from [bldrs.ai](https://b
 - *Search* the model's elements and properties.
 - *Collaborate* with teammates by commenting on model parts and properties (in development).
 - *Share* with teammates, using permalinks to model parts with exact camera views.
-- *Extend* our platform with your Apps. (in development
+- *Extend* our platform with your Apps. (in development)
 
 Visit [bldrs.ai](https://bldrs.ai/) for more info.
