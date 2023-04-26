@@ -35,6 +35,19 @@ export async function initializeSupervizSDK() {
     enableFollow: true,
     enableGoTo: true,
     enableGather: true,
+    customColors: {
+      'sv-primary-900': '16 29 70',
+      'sv-primary-200': '141 164 239',
+      'sv-primary': '58 92 204',
+      'sv-gray-800': '250 250 252',
+      'sv-gray-700': '233 229 239',
+      'sv-gray-600': '201 196 209',
+      'sv-gray-500': '174 169 184',
+      'sv-gray-400': '126 122 136',
+      'sv-gray-300': '87 83 95',
+      'sv-gray-200': '57 54 62',
+      'sv-gray-100': '38 36 42',
+    },
   })
 }
 

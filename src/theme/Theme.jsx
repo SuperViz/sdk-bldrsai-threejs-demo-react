@@ -13,7 +13,8 @@ export default function useShareTheme() {
   const [mode, setMode] = useState(Privacy.getCookie({
     component: 'theme',
     name: 'mode',
-    defaultValue: getSystemCurrentLightDark(),
+    defaultValue: Themes.Night,
+    // defaultValue: getSystemCurrentLightDark(),
   }))
   const [themeChangeListeners] = useState({})
 
