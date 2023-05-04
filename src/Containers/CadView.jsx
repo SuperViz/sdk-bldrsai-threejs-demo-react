@@ -172,18 +172,21 @@ export default function CadView({
       await initializeSupervizSDK()
       const viewerState = useStore.getState().viewer
       await loadPluginSupervizSDK(viewerState)
-      await superviz.subscribe(SDK_SYNC_PLANE_SELECTED, function(selectedId) {
+      await superviz.subscribe(SDK_SYNC_PLANE_SELECTED, function(payload) {
+        const selectedId = payload.at(-1).data
         navigate(selectedId)
       })
       await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_JOINED, function() {
         clipper()
       })
       await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MEETING_HOST_CHANGE, function(payload) {
+        const host = payload.at(-1).data
         deselectItems()
-        isHost = payload.id === myParticipantId
+        isHost = host.id === myParticipantId
       })
       await superviz.subscribe(this.SuperVizSdk.MeetingEvent.MY_PARTICIPANT_UPDATED, function(payload) {
-        isHost = payload.isHost
+        const participant = payload.at(-1).data
+        isHost = participant.isHost
       })
       await superviz.subscribe(SDK_SYNC_DESELECT_ITEMS, function() {
         if (!isHost) {
@@ -191,7 +194,8 @@ export default function CadView({
         }
       })
       // change model
-      await superviz.subscribe(CONTENT_SYNC_CHANGE_MODEL, function(newModel) {
+      await superviz.subscribe(CONTENT_SYNC_CHANGE_MODEL, function(payload) {
+        const newModel = payload.at(-1).data
         if (!isHost) {
           navigate({pathname: newModel})
         }
@@ -483,7 +487,8 @@ export default function CadView({
    *
    */
   function clipper() {
-    superviz.subscribe(SDK_SYNC_CUT_PLANES, (async (content) => {
+    superviz.subscribe(SDK_SYNC_CUT_PLANES, (async (payload) => {
+      const content = payload.at(-1).data
       if (!isHost) {
         if (viewer.clipper.context.clippingPlanes.length === 0) {
           await initializePlane({direction: 'x'})

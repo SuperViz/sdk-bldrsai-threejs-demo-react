@@ -86,8 +86,9 @@ export async function loadPluginSupervizSDK(viewer, load = null) {
     loadPlugin()
   })
 
-  await superviz.subscribe(RealtimeEvent.REALTIME_FOLLOW_PARTICIPANT, (followParticipantId) => {
-    cameraControls.enabled = ((followParticipantId === undefined || followParticipantId === myParticipantId))
+  await superviz.subscribe(RealtimeEvent.REALTIME_FOLLOW_PARTICIPANT, (payload) => {
+    const followParticipantId = payload.at(-1).data
+    cameraControls.enabled = ((followParticipantId === null || followParticipantId === myParticipantId))
   })
 
   await superviz.subscribe(RealtimeEvent.REALTIME_GATHER, () => {
@@ -100,14 +101,16 @@ export async function loadPluginSupervizSDK(viewer, load = null) {
     }
   })
 
-  await superviz.subscribe(CONTENT_SYNC_CAMERA_POSITION, function(cameraPosition) {
+  await superviz.subscribe(CONTENT_SYNC_CAMERA_POSITION, function(payload) {
+    const cameraPosition = payload.at(-1).data
     if (!isHost) {
       cameraControls.setPosition(cameraPosition.position.x, cameraPosition.position.y, cameraPosition.position.z)
     }
     cameraControls.enabled = true
   })
 
-  await superviz.subscribe(RealtimeEvent.REALTIME_GO_TO_PARTICIPANT, (goToUserId) => {
+  await superviz.subscribe(RealtimeEvent.REALTIME_GO_TO_PARTICIPANT, (payload) => {
+    const goToUserId = payload.at(-1).data
     cameraControls.enabled = false
     const participantsOn3D = supervizPlugin.getParticipantsOn3D()
     const goToParticipant = participantsOn3D.find((participantOn3D) => {
