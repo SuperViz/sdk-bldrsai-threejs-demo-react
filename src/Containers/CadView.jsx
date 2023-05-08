@@ -201,6 +201,12 @@ export default function CadView({
         }
         superviz.unloadPlugin()
       })
+
+      const iframeMeetingSettings = document.getElementById('sv-video-frame')
+      iframeMeetingSettings.addEventListener('load', function() {
+        document.getElementById('loader-ms').style.display = 'none'
+        document.querySelector('.sv_video_wrapper').setAttribute('style', 'z-index: 22; position: absolute;')
+      })
     })()
   }, [])
 
@@ -690,6 +696,38 @@ export default function CadView({
     }
   }
 
+  const cssClass = `
+    .loader-wrapper {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 1401;
+      background: #6210CC;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loader {
+      border: 4px solid #6210CC;
+      border-top: 4px solid #C1FBDF;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  `
+
   const windowDimensions = useWindowDimensions()
   const spacingBetweenSearchAndOpsGroupPx = 20
   const operationsGroupWidthPx = 60
@@ -707,6 +745,9 @@ export default function CadView({
       }}
       data-model-ready={modelReady}
     >
+      <div id="loader-ms" className="loader-wrapper">
+        <div className="loader"/>
+      </div>
       <Box
         sx={{
           position: 'absolute',
@@ -773,6 +814,9 @@ export default function CadView({
       {alert}
       {viewer && <OperationsGroupAndDrawer deselectItems={deselectItems}/>
       }
+      <style>
+        {cssClass}
+      </style>
     </Box>
   )
 }
