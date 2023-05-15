@@ -104,6 +104,11 @@ export default function Invite({
         opacity: 1;
     }
 
+    .invite-input {
+      margin-top: 25px;
+      margin-bottom: 70px;
+    }
+
     @media screen and (max-width: 935px) {
         input.sv-demo-invite-input {
             width: 235px;
@@ -114,6 +119,15 @@ export default function Invite({
         }
         sv-demo-image {
             display: none;
+        }
+
+        .invite-input {
+          margin-top: 0px;
+          margin-bottom: 0px;
+        }
+
+        .box-side {
+          height: 250px;
         }
     }
   `
